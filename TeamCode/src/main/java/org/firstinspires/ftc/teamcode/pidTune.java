@@ -74,7 +74,7 @@ Last updated on 12/5/2024
  */
 
 @TeleOp
-public class ITDMainTeleOpv3 extends OpMode
+public class pidTune extends OpMode
 {
     // Declare OpMode members (initlaize primitve variables and set up servos that we don't initlaize in the class).
     private ElapsedTime runtime = new ElapsedTime();
@@ -187,53 +187,7 @@ public class ITDMainTeleOpv3 extends OpMode
         boolean dpadRight1 = gamepad1.dpad_right;
         double speedModifier = 1-(gamepad1.left_trigger*0.8);
 
-        // Does math and calibrates the trigger positions to be inline to the servo's requirements
-        double trigger = 0.5+(leftTriggerRaw*0.5)-(rightTriggerRaw*0.5);
 
-        // sets wrist servo's position equal to what we just calculated
-        wristServo.setPosition(trigger);
-
-        //Requests information from the pinpoint computer each loop
-        odo.update();
-
-        /*
-        gets the current Position (x & y in inches, and heading in degrees) of the robot, and prints it.
-        */
-        Pose2D pos = odo.getPosition();
-        String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Position", data);
-
-        /*
-        gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
-        */
-        Pose2D vel = odo.getVelocity();
-        String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.INCH), vel.getY(DistanceUnit.INCH), vel.getHeading(AngleUnit.DEGREES));
-        telemetry.addData("Velocity", velocity);
-
-
-        // Denominator is the largest motor power (absolute value) or 1
-        // This ensures all the powers maintain the same ratio,
-        // but only if at least one is out of the range [-1, 1]
-        // TLDR mecanum wheel drive math
-        // this is also an if statement. basically, it just does the 90 degree movements that
-        // owen wanted when the left stick is not being used
-
-        myDrivetrain.fullDrive(-x,y,-rx,speedModifier, dpadUp1,dpadDown1,dpadLeft1,dpadRight1);
-
-
-        //input for continuous rotation servo with rubber wheel
-        if (a_button && b_button) {
-            crServo.setPower(0);
-        }
-        else if (a_button){
-            crServo.setPower(-1);
-        }
-        else if (b_button){
-            crServo.setPower(1);
-        }
-        else {
-            crServo.setPower(0);
-        }
         //arm motor logic!
         //myArmMotor.armMotStickControl(ly2);
         if(gamepad2.x){
@@ -241,27 +195,31 @@ public class ITDMainTeleOpv3 extends OpMode
         } else{
             myArmMotor.armMotStickControl(ly2);
         }
-        //linear slide
-        myLift.moveSlide(-ry2);
-       // if (ry2 == 0) {
-         //   myLift.buttonLift(gamepad2.dpad_up, gamepad2.dpad_down);
-        //}
-
-        //calculates the frequency at which the program can complete one loop through the program
-        double newTime = getRuntime();
-        double loopTime = newTime-oldTime;
-        double frequency = 1/loopTime;
-        oldTime = newTime;
-        telemetry.addData("Rev Hub Clock Speed", frequency);
-
-        // Show the elapsed game time and wheel power.
-        telemetry.addData("Rev Hub Clock Speed", frequency);
-        telemetry.addData("Status", "Run Time: " + runtime.toString());
-        telemetry.addData("LeftTrigger", gamepad1.left_trigger);
-        telemetry.addData("leftLiftMotor ", myLift.LSMLeft.getCurrentPosition());
-        telemetry.addData("rightLiftMotor ", myLift.LSMRight.getCurrentPosition());
+        if (gamepad2.dpad_up) {
+            myArmMotor.KpTuneUp();
+        }
+        if (gamepad2.dpad_down){
+            myArmMotor.KpTuneDown();
+        }
+        if (gamepad2.dpad_right){
+            myArmMotor.KiTuneUp();
+        }
+        if (gamepad2.dpad_left){
+            myArmMotor.KiTuneDown();
+        }
+        if (gamepad2.a){
+            myArmMotor.KpTuneUp();
+        }
+        if (gamepad2.b){
+            myArmMotor.KdTuneDown();
+        }
         telemetry.addData("armMotor",armMotor.getCurrentPosition());
-        telemetry.addData("stepButtonLift",myLift.stepButtonLift);
+        telemetry.addData("dpad up=kp up", "");
+        telemetry.addData("dpad right=ki up", "");
+        telemetry.addData("a=kd up", "");
+        telemetry.addData("KP value", myArmMotor.Kp);
+        telemetry.addData("KI value", myArmMotor.Ki);
+        telemetry.addData("KD value", myArmMotor.Kd );
     }
 
     /*

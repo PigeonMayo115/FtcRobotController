@@ -16,6 +16,9 @@ public class ArmMotor {
     private double integralSum = 0;
     private double lastError = 0;
     private boolean setPointReached = false;
+    public double Kp = 0;
+    public double Ki = 0;
+    public double Kd = 0;
     //resets encoders, sets mins and maxes
     public ArmMotor(HardwareMap hwMap) {
         armMot = hwMap.dcMotor.get("armMotor");
@@ -63,9 +66,7 @@ public class ArmMotor {
 
          */
 
-        double Kp = 0;
-        double Ki = 0;
-        double Kd = 0;
+
 
 
 
@@ -99,5 +100,23 @@ public class ArmMotor {
             timer.reset();
 
         }
+    }
+    public void KpTuneUp(){
+        Kp = Kp + .05;
+    }
+    public void KpTuneDown(){
+        Kp = Kp - .05;
+    }
+    public void KiTuneUp(){
+        Ki = Ki + .05;
+    }
+    public void KiTuneDown(){
+        Ki = Ki - .05;
+    }
+    public void KdTuneUp(){
+        Kd = Kd + .05;
+    }
+    public void KdTuneDown(){
+        Kd = Kd - .05;
     }
 }
