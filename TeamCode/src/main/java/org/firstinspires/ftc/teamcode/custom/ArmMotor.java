@@ -59,16 +59,11 @@ public class ArmMotor {
         }
 
     }
-    public void pidControl(int armMotPos, int targetPos){
-        /*
-
-         * Proportional Integral Derivative Controller
-
-         */
+    /*public void pidControl(int armMotPos, int targetPos){
 
 
 
-
+         //Proportional Integral Derivative Controller
 
         if (armMotPos == targetPos){
             setPointReached = true;
@@ -118,5 +113,5 @@ public class ArmMotor {
     }
     public void KdTuneDown(){
         Kd = Kd - .05;
-    }
+    }*/
 }
