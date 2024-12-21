@@ -31,14 +31,14 @@ public class ArmMotor {
 
     }
 
-    public void armMotStickControl(double cmd){
+    public void armMotStickControl(double cmd, double power){
         if (cmd == 0){
             armMot.setTargetPosition(armMotPos);
             armMot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
         else {
             armMot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            armMot.setPower(-cmd*0.75);
+            armMot.setPower(-cmd*power);
             armMotPos = armMot.getCurrentPosition();
         }
     }

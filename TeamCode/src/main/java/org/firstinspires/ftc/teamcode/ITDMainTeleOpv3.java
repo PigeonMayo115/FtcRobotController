@@ -235,11 +235,10 @@ public class ITDMainTeleOpv3 extends OpMode
             crServo.setPower(0);
         }
         //arm motor logic!
-        //myArmMotor.armMotStickControl(ly2);
-        if(gamepad2.x){
-        myArmMotor.pidControl(myArmMotor.armMot.getCurrentPosition(), 2000);
-        } else{
-            myArmMotor.armMotStickControl(ly2);
+        if (gamepad2.left_stick_button){
+            myArmMotor.armMotStickControl(ly2,.5);
+        }else{
+            myArmMotor.armMotStickControl(ly2,1);
         }
         //linear slide
         myLift.moveSlide(-ry2);
