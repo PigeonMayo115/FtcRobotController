@@ -40,6 +40,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.custom.ArmMotor;
+import org.firstinspires.ftc.teamcode.custom.CrServo;
 import org.firstinspires.ftc.teamcode.custom.Drivetrain;
 import org.firstinspires.ftc.teamcode.custom.GoBildaPinpointDriver;
 import org.firstinspires.ftc.teamcode.custom.Lift;
@@ -78,7 +79,6 @@ public class ITDMainTeleOpv3 extends OpMode
 {
     // Declare OpMode members (initlaize primitve variables and set up servos that we don't initlaize in the class).
     private ElapsedTime runtime = new ElapsedTime();
-    CRServo crServo = null;
     Servo wristServo = null;
     DcMotor armMotor = null;
     int positionArmMotor = 0;
@@ -90,6 +90,7 @@ public class ITDMainTeleOpv3 extends OpMode
 
     private Drivetrain myDrivetrain;
     private ArmMotor myArmMotor;
+    private CrServo myCrServo;
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 
     double oldTime = 0;
@@ -105,11 +106,11 @@ public class ITDMainTeleOpv3 extends OpMode
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         //this is where we initialize all of our classes and motors and such
-        crServo = hardwareMap.crservo.get("crServoRubberWheel");
         wristServo = hardwareMap.servo.get("wristServo");
         armMotor = hardwareMap.dcMotor.get("armMotor");
 
         myLift = new Lift(hardwareMap);     // New instance of the "lift" class
+        myCrServo = new CrServo(hardwareMap);
         // true = school, false = home
         myDrivetrain = new Drivetrain(hardwareMap,0); // New instance of the "Drivetrain" class
         myArmMotor = new ArmMotor(hardwareMap);
@@ -120,20 +121,6 @@ public class ITDMainTeleOpv3 extends OpMode
 
         // all of this stuff is for the odometry computer, this stuff is all copied over from SensorGoBildaPinpointExample,
         // look there for more questions
-
-        odo = hardwareMap.get(GoBildaPinpointDriver.class,"odo"); //initiallize odometry computer
-        //TODO: figure out where the odometry computer is relative to the center of the robot
-        //feeds the pinpoint computer the position in relation to the center of the robot
-        //for geometry purposes
-        odo.setOffsets(40, 0);
-        //feeds odometry computer the model of odometry pods you are using
-        //do not change this for the ITD season unless we decide to change what odometry wheels we are using
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //sets the directions for the odometry wheels so they don't encode backwards
-        //TODO: figure out what way is forwards and backwards on the pod
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-        //resets the position of the odo computer
-        odo.resetPosAndIMU();
 
         myLift.LSMRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         myLift.LSMLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -194,19 +181,19 @@ public class ITDMainTeleOpv3 extends OpMode
         wristServo.setPosition(trigger);
 
         //Requests information from the pinpoint computer each loop
-        odo.update();
+        myDrivetrain.odo.update();
 
         /*
         gets the current Position (x & y in inches, and heading in degrees) of the robot, and prints it.
         */
-        Pose2D pos = odo.getPosition();
+        Pose2D pos = myDrivetrain.odo.getPosition();
         String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Position", data);
 
         /*
         gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
         */
-        Pose2D vel = odo.getVelocity();
+        Pose2D vel = myDrivetrain.odo.getVelocity();
         String velocity = String.format(Locale.US,"{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.INCH), vel.getY(DistanceUnit.INCH), vel.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Velocity", velocity);
 
@@ -220,27 +207,15 @@ public class ITDMainTeleOpv3 extends OpMode
 
         myDrivetrain.fullDrive(-x,y,-rx,speedModifier, dpadUp1,dpadDown1,dpadLeft1,dpadRight1);
 
+        myCrServo.doubleCrServo(a_button,b_button);
 
-        //input for continuous rotation servo with rubber wheel
-        if (a_button && b_button) {
-            crServo.setPower(0);
-        }
-        else if (a_button){
-            crServo.setPower(-1);
-        }
-        else if (b_button){
-            crServo.setPower(1);
-        }
-        else {
-            crServo.setPower(0);
-        }
         //arm motor logic!
-        //myArmMotor.armMotStickControl(ly2);
-        if(gamepad2.x){
+        myArmMotor.armMotStickControl(ly2);
+        /*if(gamepad2.x){
         myArmMotor.pidControl(myArmMotor.armMot.getCurrentPosition(), 2000);
         } else{
             myArmMotor.armMotStickControl(ly2);
-        }
+        }*/
         //linear slide
         myLift.moveSlide(-ry2);
        // if (ry2 == 0) {

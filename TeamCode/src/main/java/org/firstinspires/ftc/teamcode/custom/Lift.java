@@ -194,17 +194,17 @@ public class Lift {
         }
 
     }
-<<<<<<< HEAD
+
     /*public void overrideLift (double cmd){
         LSMLeft.setPower(cmd);
         LSMRight.setPower(cmd);
     }*/
-=======
+
     public double antiTopple(){
         //4200 is the theoretical maximum height that the slide can go
         double mult = LSMLeft.getCurrentPosition()/4200;
         return mult;
     }
->>>>>>> 8185da7e31432a5b4f454d05438c3fad430099cf
+
 }
 

@@ -4,14 +4,17 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class CrServo {
-    CRServo crServo = null;
+    public CRServo crServoR = null;
+    public CRServo crServoL = null;
     double spitStart = 0;
     double spitEnd = 0;
     double suckStart = 0;
     double suckEnd = 0;
 
     public CrServo(HardwareMap hwMap) {
-        crServo = hwMap.crservo.get("crServoRubberWheel");
+        
+        crServoR = hwMap.crservo.get("crServoR");
+        crServoL = hwMap.crservo.get("crServoL");
     }
 
     public boolean suck (double howLong, double currentTime){
@@ -22,10 +25,12 @@ public class CrServo {
         if (currentTime > suckStart + howLong){
             suckStart = 0;
             suckEnd = 0;
-            crServo.setPower(0);
+            crServoR.setPower(0);
+            crServoL.setPower(0);
             return true;
         } else{
-            crServo.setPower(-1);
+            crServoL.setPower(-1);
+            crServoR.setPower(-1);
             return false;
         }
     }
@@ -38,19 +43,39 @@ public class CrServo {
        if (currentTime > spitStart + howLong){
            spitStart = 0;
            spitEnd = 0;
-           crServo.setPower(0);
+           crServoL.setPower(0);
+           crServoR.setPower(0);
            return true;
        } else{
-           crServo.setPower(0.3);
+           crServoL.setPower(0.3);
+           crServoR.setPower(-0.3);
            return false;
        }
     }
-    public void spitSimple (){
-        crServo.setPower(1);
+    
+    public void doubleCrServo (boolean a, boolean b){
+        //input for continuous rotation servo with rubber wheel
+        if (a && b ) {
+             crServoL.setPower(0);
+             crServoR.setPower(0);
+        }
+        else if (a ){
+             crServoL.setPower(-1);
+             crServoR.setPower(1);
+        }
+        else if (b ){
+             crServoL.setPower(1);
+             crServoR.setPower(-1);
+        }
+        else {
+             crServoL.setPower(0);
+             crServoR.setPower(0);
+        }
     }
 
     public boolean stop(){
-        crServo.setPower(0);
+        crServoL.setPower(0);
+        crServoR.setPower(0);
         return true;
     }
 }

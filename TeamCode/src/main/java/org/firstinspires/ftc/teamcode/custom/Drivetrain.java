@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class Drivetrain {
     public DcMotor flMot;
@@ -15,10 +17,16 @@ public class Drivetrain {
     public DcMotor frMot;
     public DcMotor brMot;
     public IMU imu;
+    public GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
     public double targetHeading;
     public int targetDistance;
     int encoderResolution;
     double ticksPerInch;
+    double xDifference;
+    double yDifference;
+    double xPower;
+    double yPower;
+    int moveToCoordinateState = 0;
 
     // Enum used to track which robot we're running on now
     // TODO: Select the robot programmatically.
@@ -50,6 +58,20 @@ public class Drivetrain {
         brMot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         RevHubOrientationOnRobot revOrientation;
+
+        odo = hwMap.get(GoBildaPinpointDriver.class,"odo"); //initiallize odometry computer
+        //TODO: figure out where the odometry computer is relative to the center of the robot
+        //feeds the pinpoint computer the position in relation to the center of the robot
+        //for geometry purposes
+        odo.setOffsets(40, 0);
+        //feeds odometry computer the model of odometry pods you are using
+        //do not change this for the ITD season unless we decide to change what odometry wheels we are using
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        //sets the directions for the odometry wheels so they don't encode backwards
+        //TODO: figure out what way is forwards and backwards on the pod
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        //resets the position of the odo computer
+        odo.resetPosAndIMU();
 
         // Motor Setup
         switch (robotConfig){
@@ -273,7 +295,6 @@ public class Drivetrain {
             this.setMotPow(0, 0, 0, 0, 0);
         }
     }
-
     public boolean moveForwardInches(int distance) {
         int distanceTicks;
         if (targetDistance == 0) {        // Move not started yet
@@ -321,30 +342,87 @@ public class Drivetrain {
                 }
             }
         }
-    public void moveReverseInches(int distance){
-        int distanceTicks = (int) (distance*ticksPerInch);
-        flMot.setTargetPosition(-distanceTicks);
-        blMot.setTargetPosition(-distanceTicks);
-        frMot.setTargetPosition(-distanceTicks);
-        brMot.setTargetPosition(-distanceTicks);
-        this.setMotRTP();
-    }
-    public void moveLeftInches(int distance){
-        int distanceTicks = (int) (distance*ticksPerInch);
-        flMot.setTargetPosition(-distanceTicks);
-        blMot.setTargetPosition(distanceTicks);
-        frMot.setTargetPosition(distanceTicks);
-        brMot.setTargetPosition(-distanceTicks);
-        this.setMotRTP();
-    }
-    public void moveRightInches(int distance){
-        int distanceTicks = (int) (distance*ticksPerInch);
-        flMot.setTargetPosition(distanceTicks);
-        blMot.setTargetPosition(-distanceTicks);
-        frMot.setTargetPosition(-distanceTicks);
-        brMot.setTargetPosition(distanceTicks);
-        this.setMotRTP();
-    }
+            //This is a method that uses our highly anticipated odometry pods to translate our
+            //position to a new location. this is in INCHES. NOT UNITS BUT INCHES
+        public boolean moveToCoordinates (double xTarget, double yTarget, Pose2D pos, double maxSpeed){
+            //here is what the method needs to do
+            //get our coordinates (x,y) and compare them to the target coordinates
+            //find the x distance and the y distance
+            pos = odo.getPosition();
+            maxSpeed = 0.3;
+            if (moveToCoordinateState == 0) {
+                xDifference = xTarget - pos.getX(DistanceUnit.INCH);
+                yDifference = yTarget - pos.getY(DistanceUnit.INCH);
+                moveToCoordinateState = 1;
+            }
+            //make a ratio of x to y
+            //to do this i could
+            //1. compare the x from the y
+            if (Math.abs(xDifference) > Math.abs(yDifference)){
+                if (xDifference > 0){
+                    xPower = 1;
+                    yPower = yDifference/xDifference;
+                }else if (xDifference < 0){
+                    xPower = -1;
+                    yPower = yDifference/xDifference;
+                }
+                stickDrive(xPower,yPower,0,maxSpeed,0);
+            } else if (Math.abs(xDifference) < Math.abs(yDifference)){
+                if (yDifference > 0){
+                    yPower = 1;
+                    xPower = xDifference/yDifference;
+                }else if (xDifference < 0){
+                    yPower = -1;
+                    xPower = xDifference/yDifference;
+                }
+                stickDrive(xPower,yPower,0,maxSpeed,0);
+            } else if (Math.abs(xDifference) == Math.abs(yDifference)){
+                if (xDifference > 0 && yDifference > 0){
+                    stickDrive(0.5,0.5,0,maxSpeed,0);
+                } else if (xDifference < 0 && yDifference > 0) {
+                    stickDrive(-0.5, 0.5, 0, maxSpeed, 0);
+                } else if (xDifference < 0 && yDifference < 0) {
+                    stickDrive(-0.5, -0.5, 0, maxSpeed, 0);
+                } else if (xDifference > 0 && yDifference < 0) {
+                    stickDrive(0.5, -0.5, 0, maxSpeed, 0);
+                }
+            }
+            //2. if x is greater, divide y by x and vice versa
+            //3. input both of those into stick drive
+            //check if our current location is farther to our target location
+            if (xDifference > 0 && yDifference > 0){
+                if (pos.getX(DistanceUnit.INCH) > xTarget && pos.getY(DistanceUnit.INCH) > yTarget){
+                    moveToCoordinateState = 0;
+                    return true;
+                }else {
+                    return false;
+                }
+            } else if (xDifference < 0 && yDifference > 0) {
+                if (pos.getX(DistanceUnit.INCH) < xTarget && pos.getY(DistanceUnit.INCH) > yTarget){
+                    moveToCoordinateState = 0;
+                    return true;
+                }else {
+                    return false;
+                }
+            } else if (xDifference < 0 && yDifference < 0) {
+                if (pos.getX(DistanceUnit.INCH) < xTarget && pos.getY(DistanceUnit.INCH) < yTarget){
+                    moveToCoordinateState = 0;
+                    return true;
+                }else {
+                    return false;
+                }
+            } else if (xDifference > 0 && yDifference < 0) {
+                if (pos.getX(DistanceUnit.INCH) > xTarget && pos.getY(DistanceUnit.INCH) < yTarget){
+                    moveToCoordinateState = 0;
+                    return true;
+                }else {
+                    return false;
+                }
+            }
+            //if at or past location, return true
+            //if not return false
+            return false;
+        }
 
     //TODO: make this method xD
     public void moveToPosition (double positionX, double positionY, double heading ) {
@@ -389,5 +467,7 @@ public class Drivetrain {
             brMot.setPower(1);
         }
     }
+
+
 
 }
