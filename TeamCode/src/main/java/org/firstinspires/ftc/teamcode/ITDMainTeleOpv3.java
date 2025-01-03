@@ -210,7 +210,7 @@ public class ITDMainTeleOpv3 extends OpMode
         myCrServo.doubleCrServo(a_button,b_button);
 
         //arm motor logic!
-        myArmMotor.armMotStickControl(ly2);
+        myArmMotor.armMotStickControl(-ly2,0.5);
         /*if(gamepad2.x){
         myArmMotor.pidControl(myArmMotor.armMot.getCurrentPosition(), 2000);
         } else{

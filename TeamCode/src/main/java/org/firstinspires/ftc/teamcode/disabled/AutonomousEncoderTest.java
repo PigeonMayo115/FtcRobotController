@@ -89,7 +89,7 @@ public class AutonomousEncoderTest extends OpMode
      telemetry.addData("heading",myDrivetrain.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
      //myDrivetrain.turnToHeading(-90);
 
-     myDrivetrain.moveForwardInches(18);
+     myDrivetrain.moveForwardInches(18,0.3);
 
      //myDrivetrain.setTargetHeading(-90);
 

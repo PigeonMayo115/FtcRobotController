@@ -108,7 +108,7 @@ public class ITDMainAutonomousRight extends OpMode
                 step = 10;
                 break;
             case 10://forwards 6 inches
-                stepDone = myDrivetrain.moveForwardInches(6);
+                stepDone = myDrivetrain.moveForwardInches(6,0.3);
                 if(stepDone){
                     myDrivetrain.setTargetHeading(-90);
                     step = 20;
@@ -122,7 +122,7 @@ public class ITDMainAutonomousRight extends OpMode
                 }
                 break;
             case 30: //forward 39 inches
-                stepDone = myDrivetrain.moveForwardInches(39);
+                stepDone = myDrivetrain.moveForwardInches(39,0.3);
                 if(stepDone){
                     step = 40;
                 }

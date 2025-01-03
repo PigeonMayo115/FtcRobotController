@@ -135,7 +135,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 step = 5;
                 break;
             case 5:                            //forward 65 inches
-                stepDone = myDrivetrain.moveForwardInches(14);
+                stepDone = myDrivetrain.moveForwardInches(14,0.3);
                 if(stepDone){
                     step = 15;
                 }
@@ -148,7 +148,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 16:                             // lift the arm some
-                stepDone = myArmMotor.armGoToAngle(-600);
+                stepDone = myArmMotor.armGoToAngle(600);
                 if (stepDone){
                     step = 17;
                 }
@@ -168,7 +168,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 30:                            //forward 52 inches
-                stepDone = myDrivetrain.moveForwardInches(26);
+                stepDone = myDrivetrain.moveForwardInches(26,0.3);
                 if(stepDone){
                     step = 40;
                 }
@@ -181,19 +181,19 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 50:                            //move to baskets
-                stepDone = myDrivetrain.moveForwardInches(4);
+                stepDone = myDrivetrain.moveForwardInches(5,0.3);
                 if (stepDone){
                     step = 60;
                 }
                 break;
             case 60:                            //raise lift
-                stepDone = myLift.liftTransit(2200);
+                stepDone = myLift.liftTransit(2400);
                 if (stepDone){
                     step = 70;
                 }
                 break;
             case 70:                            //extend arm
-                stepDone = myArmMotor.armGoToAngle(-3220);
+                stepDone = myArmMotor.armGoToAngle(3000);
                 if (stepDone){
                     step = 80;
                 }
@@ -205,7 +205,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 84:
-                stepDone = myArmMotor.armGoToAngle(-600);
+                stepDone = myArmMotor.armGoToAngle(600);
                 if (stepDone){
                     step = 87;
                 }
@@ -223,7 +223,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 100:                           //drive toward submersible
-                stepDone = myDrivetrain.moveForwardInches(24);
+                stepDone = myDrivetrain.moveForwardInches(24,0.3);
                 if (stepDone){
                     step = 110;
                 }
@@ -235,7 +235,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 120:                           //drive along submersible
-                stepDone = myDrivetrain.moveForwardInches( 36);
+                stepDone = myDrivetrain.moveForwardInches( 36,0.3);
                 if (stepDone){
                     step = 130;
                 }
@@ -247,7 +247,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break;
             case 145:
-                stepDone = myDrivetrain.moveForwardInches(12);
+                stepDone = myDrivetrain.moveForwardInches(12,0.3);
                 if (stepDone){
                     step = 150;
                 }
@@ -259,7 +259,7 @@ public class ITDMainAutonomousLeftSample extends OpMode
                 }
                 break; */
             case 150:                           //extend arm to touch the bar
-                stepDone = myArmMotor.armGoToAngle(-4000);
+                stepDone = myArmMotor.armGoToAngle(4000);
                 if (stepDone) {
                     step = 160;
                 }

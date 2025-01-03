@@ -65,8 +65,8 @@ public class MotorIOTest extends OpMode {
         LSMLeft = hardwareMap.dcMotor.get("LSMLeft");
         LSMRight = hardwareMap.dcMotor.get("LSMRight");
 
-        LSMLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        LSMRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        LSMLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        LSMRight.setDirection(DcMotorSimple.Direction.FORWARD);
 
         LSMLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LSMRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -126,6 +126,10 @@ public class MotorIOTest extends OpMode {
         }else if (gamepad1.dpad_right){
             LSMLeft.setPower(-1);
             LSMRight.setPower(-1);
+        }else if (gamepad1.left_stick_y != 0){
+            LSMLeft.setPower(gamepad1.left_stick_y);
+        }else if (gamepad1.right_stick_y != 0){
+            LSMRight.setPower(gamepad1.right_stick_y);
         }else if (gamepad1.dpad_down){
             myArmMotor.armMot.setPower(1);
         } else if (gamepad1.dpad_up){
@@ -138,21 +142,8 @@ public class MotorIOTest extends OpMode {
             telemetry.addData("motor: ", "none");
         }
 
-        if (gamepad1.left_stick_y > 0){
-            LSMLeft.setPower(1);
-        } else if (gamepad1.left_stick_y < 0){
-            LSMLeft.setPower(-1);
-        }else {
-            LSMLeft.setPower(0);
-        }
 
-        if (gamepad1.right_stick_y > 0){
-            LSMRight.setPower(1);
-        } else if (gamepad1.right_stick_y < 0){
-            LSMRight.setPower(-1);
-        }else {
-            LSMRight.setPower(0);
-        }
+
 
 
         telemetry.addData("front left position",myDriveTrain.flMot.getCurrentPosition());
@@ -162,6 +153,8 @@ public class MotorIOTest extends OpMode {
         telemetry.addData("armMotor position",myArmMotor.armMot.getCurrentPosition());
         telemetry.addData("liftMotLeft position",LSMLeft.getCurrentPosition());
         telemetry.addData("liftMotRight position",LSMRight.getCurrentPosition());
+        telemetry.addData("liftMotLeft power",LSMLeft.getPower());
+        telemetry.addData("liftMotRight power",LSMRight.getPower());
         telemetry.addData("=== CONTROLS ===", null);
         telemetry.addData("drivetrain:","a = fl,b = bl,x = fr,y = br");
         telemetry.addData("armMotor","dpad up = up, dpad down = down");

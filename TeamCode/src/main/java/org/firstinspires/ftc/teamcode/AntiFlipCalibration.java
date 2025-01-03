@@ -172,7 +172,7 @@ public class AntiFlipCalibration extends OpMode
                 0);
 
         myLift.moveSlide(liftCmd);
-        myArmMotor.armMotStickControl(armCmd);
+        myArmMotor.armMotStickControl(armCmd,1);
 
         //adjustment for the liftmin on gamepad 2
         if (gamepad2.dpad_up){

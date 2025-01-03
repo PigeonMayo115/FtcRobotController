@@ -137,7 +137,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 step = 5;
                 break;
             case 5:                            //forward 15 inches
-                stepDone = myDrivetrain.moveForwardInches(15);
+                stepDone = myDrivetrain.moveForwardInches(15,0.3);
                 if(stepDone){
                     step = 15;
                 }
@@ -169,7 +169,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 }
                 break;
             case 30:                            //forward 39 inches
-                stepDone = myDrivetrain.moveForwardInches(24);
+                stepDone = myDrivetrain.moveForwardInches(24,0.3);
                 if(stepDone){
                     step = 40;
                 }
@@ -181,7 +181,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 }
                 break;
             case 50:                            //move to baskets
-                stepDone = myDrivetrain.moveForwardInches(6);
+                stepDone = myDrivetrain.moveForwardInches(6,0.3);
                 if (stepDone){
                     step = 60;
                 }
@@ -223,7 +223,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 }
                 break;
             case 100:                           //drive toward submersible
-                stepDone = myDrivetrain.moveForwardInches(18);
+                stepDone = myDrivetrain.moveForwardInches(18,0.3);
                 if (stepDone){
                     step = 110;
                 }
@@ -235,7 +235,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 }
                 break;
             case 120:                           //drive along submersible
-                stepDone = myDrivetrain.moveForwardInches( 36);
+                stepDone = myDrivetrain.moveForwardInches( 36,0.3);
                 if (stepDone){
                     step = 130;
                 }
@@ -247,7 +247,7 @@ public class ITDMainAutonomousLeft extends OpMode
                 }
                 break;
             case 145:
-                stepDone = myDrivetrain.moveForwardInches( 6);
+                stepDone = myDrivetrain.moveForwardInches( 6,0.3);
                 if (stepDone){
                     step = 150;
                 }

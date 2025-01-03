@@ -29,15 +29,15 @@ public class Lift {
         LSMRight = hwMap.dcMotor.get("LSMRight");
         posLSMMinLeft = LSMLeft.getCurrentPosition();
         posLSMMinRight = LSMRight.getCurrentPosition();
-        posLSMMaxLeft = LSMLeft.getCurrentPosition() + 2200;
-        posLSMMaxRight = LSMRight.getCurrentPosition() + 2200;
+        posLSMMaxLeft = LSMLeft.getCurrentPosition() + 2700;
+        posLSMMaxRight = LSMRight.getCurrentPosition() + 2700;
         posLSMMaxLeftWorm = LSMLeft.getCurrentPosition() + 4200;
         posLSMMaxRightWorm = LSMRight.getCurrentPosition() + 4200;
         LSMLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         LSMRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        LSMLeft.setDirection(DcMotorSimple.Direction.FORWARD);
-        LSMRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        LSMLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        LSMRight.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     public void holdBottom() {

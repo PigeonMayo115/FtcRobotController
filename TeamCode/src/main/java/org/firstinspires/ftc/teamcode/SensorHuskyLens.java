@@ -30,7 +30,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.teamcode.disabled;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -60,7 +60,6 @@ import java.util.concurrent.TimeUnit;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 @TeleOp(name = "Sensor: HuskyLens", group = "Sensor")
-@Disabled
 public class SensorHuskyLens extends LinearOpMode {
 
     private final int READ_PERIOD = 1;
@@ -113,7 +112,7 @@ public class SensorHuskyLens extends LinearOpMode {
          *
          * Other algorithm choices for FTC might be: OBJECT_RECOGNITION, COLOR_RECOGNITION or OBJECT_CLASSIFICATION.
          */
-        huskyLens.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
+        huskyLens.selectAlgorithm(HuskyLens.Algorithm.COLOR_RECOGNITION);
 
         telemetry.update();
         waitForStart();
@@ -145,13 +144,16 @@ public class SensorHuskyLens extends LinearOpMode {
                 telemetry.addData("Block", blocks[i].toString());
                 /*
                  * Here inside the FOR loop, you could save or evaluate specific info for the currently recognized Bounding Box:
-                 * - blocks[i].width and blocks[i].height   (size of box, in pixels)
-                 * - blocks[i].left and blocks[i].top       (edges of box)
+                 blocks[i].width and blocks[i].height   (size of box, in pixels)
+                 blocks[i].left and blocks[i].top       (edges of box)
                  * - blocks[i].x and blocks[i].y            (center location)
                  * - blocks[i].id                           (Color ID)
                  *
                  * These values have Java type int (integer).
                  */
+                telemetry.addData("X",blocks[i].x);
+                telemetry.addData("Y",blocks[i].y);
+                telemetry.addData("ID:",blocks[i].id);
             }
 
             telemetry.update();

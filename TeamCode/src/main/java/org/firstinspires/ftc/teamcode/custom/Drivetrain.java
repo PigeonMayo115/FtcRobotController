@@ -22,6 +22,7 @@ public class Drivetrain {
     public int targetDistance;
     int encoderResolution;
     double ticksPerInch;
+    double ticksPerInchStrafe;
     double xDifference;
     double yDifference;
     double xPower;
@@ -76,9 +77,9 @@ public class Drivetrain {
         // Motor Setup
         switch (robotConfig){
             case BOGG:
-                flMot.setDirection(DcMotorSimple.Direction.FORWARD);
+                flMot.setDirection(DcMotorSimple.Direction.REVERSE);
                 blMot.setDirection(DcMotorSimple.Direction.FORWARD);
-                frMot.setDirection(DcMotorSimple.Direction.REVERSE);
+                frMot.setDirection(DcMotorSimple.Direction.FORWARD);
                 brMot.setDirection(DcMotorSimple.Direction.REVERSE);
                 encoderResolution= 550; // for bogg (yellowJacket) the resolution is 550
                 break;
@@ -97,6 +98,8 @@ public class Drivetrain {
                 encoderResolution= 440; // for the rev motors, the resolution is 440
                 break;
         }
+        ticksPerInchStrafe = encoderResolution*1.2/(4.1*Math.PI);
+        //ticksPerInchStrafe = 41.34;
         ticksPerInch = encoderResolution/(4.1*Math.PI);
         frMot.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
         blMot.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
@@ -189,7 +192,7 @@ public class Drivetrain {
     //  - Then must turn past 180 before looking for done.
     public boolean turnToHeading(double heading, Turn direction){
 
-        double overShootAdjuster = 8.0;        // seems to overshoot by 11 degrees
+        double overShootAdjuster = 11;        // seems to overshoot by 11 degrees
         double currentHeading = getHeading(AngleUnit.DEGREES);
         setMotRUE();                            // Run Using Encoder
 
@@ -225,6 +228,112 @@ public class Drivetrain {
             return false;
         }
     }
+
+    public boolean turnToHeadingV2(double heading, Turn direction){
+
+        double overShootAdjuster = 11;        // seems to overshoot by 11 degrees
+        double currentHeading = getHeading(AngleUnit.DEGREES);
+        setMotRUE();                            // Run Using Encoder
+
+        if(direction == Turn.LEFT && heading < currentHeading){
+            setMotPow(-0.5,-0.5,0.5,0.5,1);
+            return false;
+        }
+        if (direction == Turn.RIGHT && heading > currentHeading) {
+            setMotPow(0.5,0.5,-0.5,-0.5,1);
+            return false;
+        }
+
+        if(direction == Turn.LEFT){
+            //we are turning left
+            if(getHeading(AngleUnit.DEGREES)<(heading-5)){
+                setMotPow(-0.05,-0.05,0.05,0.05,1);
+                return false;
+            } else if (getHeading(AngleUnit.DEGREES)<(heading-10)){
+                setMotPow(-0.1,-0.1,0.1,0.1,1);
+                return false;
+            }else if (getHeading(AngleUnit.DEGREES)<(heading-30)) {
+                setMotPow(-0.3, -0.3, 0.3, 0.3, 1);
+                return false;
+            } else if (getHeading(AngleUnit.DEGREES)<(heading)) {
+                setMotPow(-0.6, -0.6, 0.6, 0.6, 1);
+                return false;
+            }else {
+                setMotPow(0,0,0,0,0);
+                return true;
+            }
+        }
+        if (direction == Turn.RIGHT){
+            //we are turning right
+            if(getHeading(AngleUnit.DEGREES)<(heading+5)){
+                setMotPow(0.05,0.05,-0.05,-0.05,1);
+                return false;
+            } else if (getHeading(AngleUnit.DEGREES)<(heading+10)){
+                setMotPow(0.1,0.1,-0.1,-0.1,1);
+                return false;
+            }else if (getHeading(AngleUnit.DEGREES)<(heading+30)) {
+                setMotPow(0.3, 0.3, -0.3, -0.3, 1);
+                return false;
+            } else if (getHeading(AngleUnit.DEGREES)<(heading)) {
+                setMotPow(0.6, 0.6, -0.6, -0.6, 1);
+                return false;
+            }else {
+                setMotPow(0,0,0,0,0);
+                return true;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    //All the <direction> to <X or Y> methods require you to be at heading 0 degrees
+    //DO NOT TRY TO DO IT OTHERWISE OR IT WONT WORK
+    public boolean forwardToX (Pose2D pose2D, double targetX){
+        if (pose2D.getX(DistanceUnit.INCH) < targetX){
+            setMotPow(0.3,0.3,0.3,0.3,1);
+            return false;
+        } else if (pose2D.getX(DistanceUnit.INCH) >= targetX){
+            setMotPow(0,0,0,0,1);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean reverseToX (Pose2D pose2D, double targetX){
+        if (pose2D.getX(DistanceUnit.INCH) > targetX){
+            setMotPow(-0.3,-0.3,-0.3,-0.3,1);
+            return false;
+        } else if (pose2D.getX(DistanceUnit.INCH) <= targetX){
+            setMotPow(0,0,0,0,1);
+            return true;
+        }
+        return false;
+
+    }
+
+    public boolean leftToY (Pose2D pose2D,double targetY){
+        if (pose2D.getY(DistanceUnit.INCH) > targetY){
+            setMotPow(-0.3,0.3,0.3,-0.3,1);
+            return false;
+        } else if (pose2D.getY(DistanceUnit.INCH) <= targetY){
+            setMotPow(0,0,0,0,1);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean rightToY (Pose2D pose2D,double targetY){
+        if (pose2D.getY(DistanceUnit.INCH) < targetY){
+            setMotPow(0.3,-0.3,-0.3,0.3,1);
+            return false;
+        } else if (pose2D.getY(DistanceUnit.INCH) >= targetY){
+            setMotPow(0,0,0,0,1);
+            return true;
+        }
+        return false;
+
+    }
+
     public boolean dumbTurn(double degrees){
         setMotRUE();
         if (getHeading(AngleUnit.DEGREES)==degrees){
@@ -295,8 +404,11 @@ public class Drivetrain {
             this.setMotPow(0, 0, 0, 0, 0);
         }
     }
-    public boolean moveForwardInches(int distance) {
+    public boolean moveForwardInches(int distance, double power) {
         int distanceTicks;
+        if (power == 0){
+            power = 0.3;
+        }
         if (targetDistance == 0) {        // Move not started yet
             setMotSRE();                // Clear the encoders
             targetDistance = distance;
@@ -314,6 +426,30 @@ public class Drivetrain {
                 return true;
             } else {                                                // run it forward
                 this.setMotPow(0.3, 0.3, 0.3, 0.3, 1);
+                return false;
+            }
+        }
+    }
+    //input a positive value for this method
+    public boolean moveReverseInches(int distance) {
+        int distanceTicks;
+        if (targetDistance == 0) {        // Move not started yet
+            setMotSRE();                // Clear the encoders
+            targetDistance = distance;
+            return false;
+        } else {
+            distanceTicks = (int) (-distance * ticksPerInch);
+            flMot.setTargetPosition(distanceTicks);
+            blMot.setTargetPosition(distanceTicks);
+            frMot.setTargetPosition(distanceTicks);
+            brMot.setTargetPosition(distanceTicks);
+            setMotRTP();
+            if (flMot.getCurrentPosition() <= distanceTicks) {       // all done
+                setMotPow(0, 0, 0, 0, 0);
+                targetDistance = 0;
+                return true;
+            } else {                                                // run it forward
+                this.setMotPow(-0.3, -0.3, -0.3, -0.3, 1);
                 return false;
             }
         }
@@ -342,6 +478,55 @@ public class Drivetrain {
                 }
             }
         }
+
+        public boolean strafeRightInches (int distance){
+            if (targetDistance == 0) {        // Move not started yet
+                setMotSRE();                // Clear the encoders
+                targetDistance = distance;
+                return false;
+            } else {
+                int distanceTicks = (int) (distance * ticksPerInchStrafe);
+                flMot.setTargetPosition(distanceTicks);
+                blMot.setTargetPosition(-distanceTicks);
+                frMot.setTargetPosition(-distanceTicks);
+                brMot.setTargetPosition(distanceTicks);
+                setMotRTP();
+                if ((flMot.getCurrentPosition()) >= distanceTicks) {       // all done
+                    setMotPow(0, 0, 0, 0, 0);
+                    targetDistance = 0;
+                    return true;
+                } else {                                                // run it diagonal
+                    setMotPow(0.3, 0.3, 0.3, 0.3, 1);
+                    return false;
+                }
+            }
+
+        }
+
+    public boolean strafeLeftInches (int distance) {
+        int distanceTicks;
+        if (targetDistance == 0) {        // Move not started yet
+            setMotSRE();                // Clear the encoders
+            targetDistance = distance;
+            return false;
+        } else {
+            distanceTicks = (int) (distance * ticksPerInchStrafe);
+            flMot.setTargetPosition(-distanceTicks);
+            blMot.setTargetPosition(distanceTicks);
+            frMot.setTargetPosition(distanceTicks);
+            brMot.setTargetPosition(-distanceTicks);
+            setMotRTP();
+            if (-(flMot.getCurrentPosition()) >= distanceTicks) {       // all done
+                setMotPow(0, 0, 0, 0, 0);
+                targetDistance = 0;
+                return true;
+            } else {
+                setMotPow(0.3, 0.3, 0.3, 0.3, 1);
+                return false;
+            }
+        }
+    }
+
             //This is a method that uses our highly anticipated odometry pods to translate our
             //position to a new location. this is in INCHES. NOT UNITS BUT INCHES
         public boolean moveToCoordinates (double xTarget, double yTarget, Pose2D pos, double maxSpeed){
@@ -355,6 +540,7 @@ public class Drivetrain {
                 yDifference = yTarget - pos.getY(DistanceUnit.INCH);
                 moveToCoordinateState = 1;
             }
+
             //make a ratio of x to y
             //to do this i could
             //1. compare the x from the y
