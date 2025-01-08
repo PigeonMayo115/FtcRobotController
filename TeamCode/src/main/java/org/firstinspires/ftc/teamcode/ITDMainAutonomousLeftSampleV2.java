@@ -73,8 +73,8 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
     boolean stepDone3 = false;
     ElapsedTime runtime = new ElapsedTime();
     
-    double firstPickupX = 11;
-    double firstPickupY = -15.6;
+    double firstPickupX = 12;
+    double firstPickupY = 16.45;
 
     @Override
     public void init() {
@@ -131,6 +131,8 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
         telemetry.addData("armMotor",myArmMotor.armMot.getCurrentPosition());
         telemetry.addData("servo pos",wristServo.getPosition());
 
+        myDrivetrain.odo.update();
+
         Pose2D pos = myDrivetrain.odo.getPosition();
         String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Position", data);
@@ -186,8 +188,8 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 }
                 break;
             case 45:
-                stepDone = myLift.liftTransit(2550);
-                myArmMotor.armGoToAngle(3000);
+                myLift.liftTransit(2550);
+                stepDone = myArmMotor.armGoToAngle(3000,0.3);
                 if (stepDone) {
                     step = 50;
                 }
@@ -200,18 +202,13 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 break;
             case 55:
                 stepDone = myDrivetrain.turnToHeading(0, Drivetrain.Turn.RIGHT);
+                myLift.liftTransit(0);
                 if (stepDone) {
                     step = 60;
                 }
                 break;
             case 60:
                 stepDone = myDrivetrain.moveForwardInches(8, 0.3);
-                if (stepDone) {
-                    step = 70;
-                }
-                break;
-            case 70:
-                stepDone = myLift.liftTransit(0);
                 if (stepDone) {
                     step = 80;
                 }
@@ -227,33 +224,55 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
             case 82:
                 //check x
                 if (pos.getX(DistanceUnit.INCH) < firstPickupX){
-                    stepDone = myDrivetrain.forwardToX(pos, firstPickupX);
-                }else if (pos.getX(DistanceUnit.INCH) >= firstPickupX){
-                    stepDone = myDrivetrain.reverseToX(pos,firstPickupX);
-                }
-                if (stepDone){
-                    step = 90;
+                    //forward
+                    step = 83;
+                }else{
+                    //reverse
+                    step = 84;
                 }
                 break;
-            case 90:
+            case 83:
+                stepDone = myDrivetrain.forwardToX(pos,firstPickupX);
+                if (stepDone){
+                    step = 87;
+                }
+                break;
+            case 84:
+                stepDone = myDrivetrain.reverseToX(pos, firstPickupX);
+                if (stepDone){
+                    step = 87;
+                }
+                break;
+            case 87:
                 //check Y
                 if (pos.getY(DistanceUnit.INCH) > firstPickupY){
-                    stepDone = myDrivetrain.leftToY(pos, firstPickupY);
-                }else if (pos.getY(DistanceUnit.INCH) <= firstPickupY){
-                    stepDone = myDrivetrain.rightToY(pos,firstPickupY);
+                    //right
+                    step = 89;
+                }else{
+                    //left
+                    step = 88;
                 }
+                break;
+            case 88:
+                stepDone = myDrivetrain.leftToY(pos, firstPickupY);
                 if (stepDone){
-                    step = 90;
+                    step = 93;
+                }
+                break;
+            case 89:
+                stepDone = myDrivetrain.rightToY(pos, firstPickupY);
+                if (stepDone){
+                    step = 93;
                 }
                 break;
             case 93:
-                stepDone = myArmMotor.armGoToAngle(5000);
+                stepDone = myArmMotor.armGoToAngle(5000,0.3);
                 if(stepDone){
                     step=95;
                 }
                 break;
             case 95:
-                stepDone = myCrServo.suck(1, time);
+                stepDone = myCrServo.suck(3, time);
                 if (stepDone) {
                     step = 100;
                 }

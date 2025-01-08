@@ -25,7 +25,7 @@ public class NewTurnTest extends OpMode {
 
         switch (step){
             case 0:
-                stepDone = myDrivetrain.turnToHeadingV2(90, Drivetrain.Turn.LEFT);
+                stepDone = myDrivetrain.turnToHeading(90, Drivetrain.Turn.LEFT);
                 if (stepDone){
                     step = 10;
                 }

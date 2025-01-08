@@ -28,6 +28,7 @@ public class Drivetrain {
     double xPower;
     double yPower;
     int moveToCoordinateState = 0;
+    double headingError;
 
     // Enum used to track which robot we're running on now
     // TODO: Select the robot programmatically.
@@ -64,13 +65,13 @@ public class Drivetrain {
         //TODO: figure out where the odometry computer is relative to the center of the robot
         //feeds the pinpoint computer the position in relation to the center of the robot
         //for geometry purposes
-        odo.setOffsets(40, 0);
+        odo.setOffsets(-152, 117);
         //feeds odometry computer the model of odometry pods you are using
         //do not change this for the ITD season unless we decide to change what odometry wheels we are using
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         //sets the directions for the odometry wheels so they don't encode backwards
         //TODO: figure out what way is forwards and backwards on the pod
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
         //resets the position of the odo computer
         odo.resetPosAndIMU();
 
@@ -190,96 +191,61 @@ public class Drivetrain {
     //  Special case when crossing over 180:
     //  - If Turning Left, and target < starting or if turning right, and target > starting
     //  - Then must turn past 180 before looking for done.
-    public boolean turnToHeading(double heading, Turn direction){
+
+    public boolean turnToHeading(double heading, Turn direction) {
 
         double overShootAdjuster = 11;        // seems to overshoot by 11 degrees
         double currentHeading = getHeading(AngleUnit.DEGREES);
-        setMotRUE();                            // Run Using Encoder
+        setMotRUE();// Run Using Encoder
 
-        if(direction == Turn.LEFT && heading < currentHeading){
+        headingError = Math.abs(getHeading(AngleUnit.DEGREES)-heading);
+
+        /*if(direction == Turn.LEFT && heading < currentHeading){
             setMotPow(-0.5,-0.5,0.5,0.5,1);
             return false;
         }
         if (direction == Turn.RIGHT && heading > currentHeading) {
             setMotPow(0.5,0.5,-0.5,-0.5,1);
             return false;
-        }
+        }*/
 
-        if(direction == Turn.LEFT){
+        if (direction == Turn.LEFT) {
             //we are turning left
-            if(getHeading(AngleUnit.DEGREES)<(heading-overShootAdjuster)){
-                setMotPow(-0.5,-0.5,0.5,0.5,1);
-                return false;
-            } else {
-                setMotPow(0,0,0,0,0);
+            if (headingError < 1) {
+                setMotPow(0, 0, 0, 0, 0);
                 return true;
-            }
-        }
-        if (direction == Turn.RIGHT){
-            //we are turning right
-            if(getHeading(AngleUnit.DEGREES)>(heading+overShootAdjuster)){
-                setMotPow(0.5,0.5,-0.5,-0.5,1);
+            } else if (headingError < 7) {
+                setMotPow(-0.05, -0.05, 0.05, 0.05, 1);
                 return false;
-            } else {
-                setMotPow(0,0,0,0,0);
-                return true;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    public boolean turnToHeadingV2(double heading, Turn direction){
-
-        double overShootAdjuster = 11;        // seems to overshoot by 11 degrees
-        double currentHeading = getHeading(AngleUnit.DEGREES);
-        setMotRUE();                            // Run Using Encoder
-
-        if(direction == Turn.LEFT && heading < currentHeading){
-            setMotPow(-0.5,-0.5,0.5,0.5,1);
-            return false;
-        }
-        if (direction == Turn.RIGHT && heading > currentHeading) {
-            setMotPow(0.5,0.5,-0.5,-0.5,1);
-            return false;
-        }
-
-        if(direction == Turn.LEFT){
-            //we are turning left
-            if(getHeading(AngleUnit.DEGREES)<(heading-5)){
-                setMotPow(-0.05,-0.05,0.05,0.05,1);
+            } else if (headingError < 15) {
+                setMotPow(-0.1, -0.1, 0.1, 0.1, 1);
                 return false;
-            } else if (getHeading(AngleUnit.DEGREES)<(heading-10)){
-                setMotPow(-0.1,-0.1,0.1,0.1,1);
-                return false;
-            }else if (getHeading(AngleUnit.DEGREES)<(heading-30)) {
+            } else if (headingError < 30) {
                 setMotPow(-0.3, -0.3, 0.3, 0.3, 1);
                 return false;
-            } else if (getHeading(AngleUnit.DEGREES)<(heading)) {
+            } else{
                 setMotPow(-0.6, -0.6, 0.6, 0.6, 1);
                 return false;
-            }else {
-                setMotPow(0,0,0,0,0);
-                return true;
             }
         }
-        if (direction == Turn.RIGHT){
+
+        if (direction == Turn.RIGHT) {
             //we are turning right
-            if(getHeading(AngleUnit.DEGREES)<(heading+5)){
-                setMotPow(0.05,0.05,-0.05,-0.05,1);
+            if (headingError < 1) {
+                setMotPow(0, 0, 0, 0, 0);
+                return true;
+            } else if (headingError < 7) {
+                setMotPow(0.05, 0.05, -0.05, -0.05, 1);
                 return false;
-            } else if (getHeading(AngleUnit.DEGREES)<(heading+10)){
-                setMotPow(0.1,0.1,-0.1,-0.1,1);
+            } else if (headingError < 15) {
+                setMotPow(0.1, 0.1, -0.1, -0.1, 1);
                 return false;
-            }else if (getHeading(AngleUnit.DEGREES)<(heading+30)) {
+            } else if (headingError < 30) {
                 setMotPow(0.3, 0.3, -0.3, -0.3, 1);
                 return false;
-            } else if (getHeading(AngleUnit.DEGREES)<(heading)) {
+            } else {
                 setMotPow(0.6, 0.6, -0.6, -0.6, 1);
                 return false;
-            }else {
-                setMotPow(0,0,0,0,0);
-                return true;
             }
         } else {
             return false;
@@ -289,8 +255,9 @@ public class Drivetrain {
     //All the <direction> to <X or Y> methods require you to be at heading 0 degrees
     //DO NOT TRY TO DO IT OTHERWISE OR IT WONT WORK
     public boolean forwardToX (Pose2D pose2D, double targetX){
+        setMotRUE();
         if (pose2D.getX(DistanceUnit.INCH) < targetX){
-            setMotPow(0.3,0.3,0.3,0.3,1);
+            setMotPow(0.1,0.1,0.1,0.1,1);
             return false;
         } else if (pose2D.getX(DistanceUnit.INCH) >= targetX){
             setMotPow(0,0,0,0,1);
@@ -300,8 +267,9 @@ public class Drivetrain {
     }
 
     public boolean reverseToX (Pose2D pose2D, double targetX){
+        setMotRUE();
         if (pose2D.getX(DistanceUnit.INCH) > targetX){
-            setMotPow(-0.3,-0.3,-0.3,-0.3,1);
+            setMotPow(-0.1,-0.1,-0.1,-0.1,1);
             return false;
         } else if (pose2D.getX(DistanceUnit.INCH) <= targetX){
             setMotPow(0,0,0,0,1);
@@ -312,10 +280,11 @@ public class Drivetrain {
     }
 
     public boolean leftToY (Pose2D pose2D,double targetY){
-        if (pose2D.getY(DistanceUnit.INCH) > targetY){
-            setMotPow(-0.3,0.3,0.3,-0.3,1);
+        setMotRUE();
+        if (pose2D.getY(DistanceUnit.INCH) < targetY){
+            setMotPow(-0.1,0.1,0.1,-0.1,1);
             return false;
-        } else if (pose2D.getY(DistanceUnit.INCH) <= targetY){
+        } else if (pose2D.getY(DistanceUnit.INCH) >= targetY){
             setMotPow(0,0,0,0,1);
             return true;
         }
@@ -323,10 +292,11 @@ public class Drivetrain {
     }
 
     public boolean rightToY (Pose2D pose2D,double targetY){
-        if (pose2D.getY(DistanceUnit.INCH) < targetY){
-            setMotPow(0.3,-0.3,-0.3,0.3,1);
+        setMotRUE();
+        if (pose2D.getY(DistanceUnit.INCH) > targetY){
+            setMotPow(0.1,-0.1,-0.1,0.1,1);
             return false;
-        } else if (pose2D.getY(DistanceUnit.INCH) >= targetY){
+        } else if (pose2D.getY(DistanceUnit.INCH) <= targetY){
             setMotPow(0,0,0,0,1);
             return true;
         }
@@ -335,6 +305,7 @@ public class Drivetrain {
     }
 
     public boolean dumbTurn(double degrees){
+
         setMotRUE();
         if (getHeading(AngleUnit.DEGREES)==degrees){
             setMotPow(0,0,0,0,0);
@@ -448,7 +419,7 @@ public class Drivetrain {
                 setMotPow(0, 0, 0, 0, 0);
                 targetDistance = 0;
                 return true;
-            } else {                                                // run it forward
+            } else {                                                // run it backwards
                 this.setMotPow(-0.3, -0.3, -0.3, -0.3, 1);
                 return false;
             }

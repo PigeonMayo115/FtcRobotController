@@ -48,16 +48,23 @@ public class ArmMotor {
         armMot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
     // sets the target position of the arm motor to the given value
-    public boolean  armGoToAngle(int targetTicks) {
-        armMot.setPower(1);
+    public boolean armGoToAngle(int targetTicks, double power) {
+        int tolerance = 10;
+        int upperLimit = targetTicks + tolerance;
+        int lowerLimit = targetTicks - tolerance;
+        armMot.setPower(power);
         armMot.setTargetPosition(targetTicks);
         armMot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (targetTicks == armMot.getCurrentPosition()) {
+        if (armMot.getCurrentPosition() < upperLimit || armMot.getCurrentPosition() > lowerLimit) {
             return true;
         } else {
             return false;
         }
 
+    }
+
+    public boolean armGoToAngle(int targetTicks){
+        return armGoToAngle(targetTicks,1);
     }
     /*public void pidControl(int armMotPos, int targetPos){
 

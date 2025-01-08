@@ -23,10 +23,14 @@ public class SimpleOdoTest extends OpMode {
 
     @Override
     public void loop() {
+        myDrivetrain.odo.update();
+        telemetry.update();
 
         Pose2D pos = myDrivetrain.odo.getPosition();
         String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.INCH), pos.getY(DistanceUnit.INCH), pos.getHeading(AngleUnit.DEGREES));
         telemetry.addData("Position", data);
+
+
 
         switch (step){
             case 0:
