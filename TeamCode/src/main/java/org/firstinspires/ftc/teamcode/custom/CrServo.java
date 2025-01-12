@@ -29,8 +29,8 @@ public class CrServo {
             crServoL.setPower(0);
             return true;
         } else{
-            crServoL.setPower(1);
-            crServoR.setPower(-1);
+            crServoL.setPower(-1);
+            crServoR.setPower(1);
             return false;
         }
     }
@@ -47,8 +47,8 @@ public class CrServo {
            crServoR.setPower(0);
            return true;
        } else{
-           crServoL.setPower(-0.3);
-           crServoR.setPower(0.3);
+           crServoL.setPower(0.3);
+           crServoR.setPower(-0.3);
            return false;
        }
     }

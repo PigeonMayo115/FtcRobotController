@@ -55,7 +55,7 @@ public class ArmMotor {
         armMot.setPower(power);
         armMot.setTargetPosition(targetTicks);
         armMot.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        if (armMot.getCurrentPosition() < upperLimit || armMot.getCurrentPosition() > lowerLimit) {
+        if ((armMot.getCurrentPosition() < upperLimit) && (armMot.getCurrentPosition() > lowerLimit)) {
             return true;
         } else {
             return false;

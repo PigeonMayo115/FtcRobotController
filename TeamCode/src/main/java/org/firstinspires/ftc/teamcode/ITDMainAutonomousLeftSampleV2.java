@@ -73,7 +73,7 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
     boolean stepDone3 = false;
     ElapsedTime runtime = new ElapsedTime();
     
-    double firstPickupX = 12;
+    double firstPickupX = 12.5;
     double firstPickupY = 16.45;
 
     @Override
@@ -150,7 +150,7 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 step = 5;
                 break;
             case 5:                            //forward 65 inches
-                stepDone = myDrivetrain.moveForwardInches(12, 0.3);
+                stepDone = myDrivetrain.moveForwardInches(12, 0.5);
                 wristServo.setPosition(0.5);
                 if (stepDone) {
                     step = 16;
@@ -169,7 +169,7 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 }
                 break;
             case 40:
-                stepDone = myDrivetrain.moveForwardInches(26, 0.3);
+                stepDone = myDrivetrain.moveForwardInches(22, 0.7);
                 if (stepDone) {
                     //TODO
                     step = 43;
@@ -182,14 +182,14 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 }
                 break;
             case 44:
-                stepDone = myDrivetrain.moveForwardInches(4,0.3);
+                stepDone = myDrivetrain.moveForwardInches(5,0.3);
                 if (stepDone) {
                     step = 45;
                 }
                 break;
             case 45:
-                myLift.liftTransit(2550);
-                stepDone = myArmMotor.armGoToAngle(3000,0.3);
+                stepDone = myLift.liftTransit(2550);
+                myArmMotor.armGoToAngle(3000);
                 if (stepDone) {
                     step = 50;
                 }
@@ -208,7 +208,7 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                 }
                 break;
             case 60:
-                stepDone = myDrivetrain.moveForwardInches(8, 0.3);
+                stepDone = myDrivetrain.moveForwardInches(8, 0.6);
                 if (stepDone) {
                     step = 80;
                 }
@@ -216,10 +216,15 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
             case 80:
                 stepDone = myDrivetrain.strafeRightInches(3);
                 if (stepDone) {
+                    step = 81;
+                }
+                break;
+            case 81:
+                stepDone = myDrivetrain.turnToHeading(0);
+                if (stepDone){
                     step = 82;
                 }
                 break;
-                
                 //position check/correction before pickup of the next block
             case 82:
                 //check x
@@ -262,19 +267,20 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
             case 89:
                 stepDone = myDrivetrain.rightToY(pos, firstPickupY);
                 if (stepDone){
+                    step = 90;
+                }
+                break;
+            case 90:
+                stepDone = myDrivetrain.turnToHeading(0, Drivetrain.Turn.LEFT);
+                if (stepDone){
                     step = 93;
                 }
                 break;
             case 93:
-                stepDone = myArmMotor.armGoToAngle(5000,0.3);
+                stepDone = myCrServo.suck(3,time);
+                myArmMotor.armGoToAngle(5000,0.4);
                 if(stepDone){
-                    step=95;
-                }
-                break;
-            case 95:
-                stepDone = myCrServo.suck(3, time);
-                if (stepDone) {
-                    step = 100;
+                    step=100;
                 }
                 break;
             case 100:
@@ -297,7 +303,60 @@ public class ITDMainAutonomousLeftSampleV2 extends OpMode
                     step = 130;
                 }
                 break;
-
+            case 130:
+            stepDone = myArmMotor.armGoToAngle(600);
+            if (stepDone){
+                step = 140;
+            }
+            break;
+            case 140:
+                stepDone = myLift.liftTransit(0);
+                if (stepDone){
+                    step = 150;
+                }
+                // to do (resolved) I think you need to lower the lift before you start driving again
+            case 150:                            //turn away from baskets
+                stepDone = myDrivetrain.turnToHeading(-40, Drivetrain.Turn.RIGHT);
+                if (stepDone){
+                    step = 160;
+                }
+                break;
+            case 160:                           //drive toward submersible
+                stepDone = myDrivetrain.moveForwardInches(24,0.9);
+                if (stepDone){
+                    step = 170;
+                }
+                break;
+            case 170:                           //turn parallel to submersible
+                stepDone = myDrivetrain.turnToHeading(0, Drivetrain.Turn.LEFT);
+                if (stepDone){
+                    step = 180;
+                }
+                break;
+            case 180:                           //drive along submersible
+                stepDone = myDrivetrain.moveForwardInches( 36,0.9);
+                if (stepDone){
+                    step = 190;
+                }
+                break;
+            case 190:                           //turn toward submersible
+                stepDone = myDrivetrain.turnToHeading(-90, Drivetrain.Turn.RIGHT);
+                if (stepDone){
+                    step = 200;
+                }
+                break;
+            case 200:
+                stepDone = myDrivetrain.moveForwardInches(12,0.9);
+                if (stepDone){
+                    step = 210;
+                }
+                break;
+            case 210:                           //extend arm to touch the bar
+                stepDone = myArmMotor.armGoToAngle(4000);
+                if (stepDone) {
+                    step = 220;
+                }
+                break;
 
         }
 

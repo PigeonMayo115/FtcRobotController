@@ -211,17 +211,17 @@ public class Drivetrain {
 
         if (direction == Turn.LEFT) {
             //we are turning left
-            if (headingError < 1) {
+            if (headingError < 2) {
                 setMotPow(0, 0, 0, 0, 0);
                 return true;
-            } else if (headingError < 7) {
+            } else if (headingError < 9) {
                 setMotPow(-0.05, -0.05, 0.05, 0.05, 1);
                 return false;
             } else if (headingError < 15) {
                 setMotPow(-0.1, -0.1, 0.1, 0.1, 1);
                 return false;
             } else if (headingError < 30) {
-                setMotPow(-0.3, -0.3, 0.3, 0.3, 1);
+                setMotPow(-0.4, -0.4, 0.4, 0.4, 1);
                 return false;
             } else{
                 setMotPow(-0.6, -0.6, 0.6, 0.6, 1);
@@ -231,17 +231,17 @@ public class Drivetrain {
 
         if (direction == Turn.RIGHT) {
             //we are turning right
-            if (headingError < 1) {
+            if (headingError < 2) {
                 setMotPow(0, 0, 0, 0, 0);
                 return true;
-            } else if (headingError < 7) {
+            } else if (headingError < 9) {
                 setMotPow(0.05, 0.05, -0.05, -0.05, 1);
                 return false;
             } else if (headingError < 15) {
                 setMotPow(0.1, 0.1, -0.1, -0.1, 1);
                 return false;
             } else if (headingError < 30) {
-                setMotPow(0.3, 0.3, -0.3, -0.3, 1);
+                setMotPow(0.4, 0.4, -0.4, -0.4, 1);
                 return false;
             } else {
                 setMotPow(0.6, 0.6, -0.6, -0.6, 1);
@@ -377,9 +377,9 @@ public class Drivetrain {
     }
     public boolean moveForwardInches(int distance, double power) {
         int distanceTicks;
-        if (power == 0){
+       /* if (power == 0){
             power = 0.3;
-        }
+        }*/
         if (targetDistance == 0) {        // Move not started yet
             setMotSRE();                // Clear the encoders
             targetDistance = distance;
@@ -396,7 +396,7 @@ public class Drivetrain {
                 targetDistance = 0;
                 return true;
             } else {                                                // run it forward
-                this.setMotPow(0.3, 0.3, 0.3, 0.3, 1);
+                this.setMotPow(power, power, power, power, 1);
                 return false;
             }
         }
