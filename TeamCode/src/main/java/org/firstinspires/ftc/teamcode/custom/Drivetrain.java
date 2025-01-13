@@ -30,12 +30,6 @@ public class Drivetrain {
     int moveToCoordinateState = 0;
     double headingError;
 
-    // Enum used to track which robot we're running on now
-    // TODO: Select the robot programmatically.
-    public enum Robot{
-        BOGG, ELIOT, MERRICK
-    }
-
     // Enum for turn direction
     public enum Turn{
         LEFT, RIGHT
@@ -47,7 +41,7 @@ public class Drivetrain {
     }
 
     // Constructor
-    public Drivetrain(HardwareMap hwMap, Robot robotConfig) {
+    public Drivetrain(HardwareMap hwMap, RobotSelect robotConfig) {
 
         flMot = hwMap.dcMotor.get("frontLeftMotor");
         blMot = hwMap.dcMotor.get("backLeftMotor");
@@ -136,20 +130,22 @@ public class Drivetrain {
 
     }
 
-    private static Robot getWhichRobot(int robotNum){
-        Robot whichRobot;
+    // For compatibility with earlier code that specified robot selection
+    // by passing an integer.  In new cases, use the RobotSelect enum.
+    private static RobotSelect getWhichRobot(int robotNum){
+        RobotSelect whichRobot;
         switch (robotNum) {       // 0 = bogg, 1 = home, 2 = eliot
             case 0:
-                whichRobot = Robot.BOGG;
+                whichRobot = RobotSelect.BOGG;
                 break;
             case 1:
-                whichRobot = Robot.MERRICK;
+                whichRobot = RobotSelect.MERRICK;
                 break;
             case 2:
-                whichRobot = Robot.ELIOT;
+                whichRobot = RobotSelect.ELIOT;
                 break;
             default:
-                whichRobot = Robot.BOGG;
+                whichRobot = RobotSelect.BOGG;
                 break;
         }
         return whichRobot;
